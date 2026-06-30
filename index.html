@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>六十四卦水墨禪修查詢系統 - 禪宗密宗修道院 謹製</title>
+    <!-- Tailwind CSS for modern fluid responsive design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for spiritual Zen icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Playfair Display & Noto Serif TC for elegant serif look -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;700;900&family=Playfair+Display:ital,wght=1,500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Serif TC', serif;
+            background-color: #f4f0ea;
+            background-image: radial-gradient(rgba(180, 160, 140, 0.15) 1px, transparent 1px);
+            background-size: 24px 24px;
+            color: #1a1a1a;
+        }
+
+        /* Ink wash effects */
+        .ink-splash {
+            background: radial-gradient(circle, rgba(20,20,20,0.08) 0%, rgba(244,240,234,0) 70%);
+        }
+
+        /* Classical Chinese scroll feel */
+        .scroll-container {
+            box-shadow: inset 0 0 40px rgba(139, 115, 85, 0.08);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Custom scrollbar to match ink theme */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f4f0ea;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2c2c2c;
+            border-radius: 3px;
+        }
+
+        /* Cinnabar Seal design */
+        .seal-red {
+            color: #a61b29;
+            border-color: #a61b29;
+        }
+        .bg-seal-red {
+            background-color: #a61b29;
+        }
+
+        /* Calligraphy lines animation */
+        @keyframes drawLine {
+            from { width: 0; opacity: 0; }
+            to { width: 100%; opacity: 1; }
+        }
+        .animate-draw {
+            animation: drawLine 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Coin spinning animation */
+        @keyframes spinCoin {
+            0% { transform: rotateY(0deg) scale(1) rotate(0deg); }
+            50% { transform: rotateY(720deg) scale(1.3) rotate(180deg); }
+            100% { transform: rotateY(1440deg) scale(1) rotate(360deg); }
+        }
+        .coin-spin {
+            animation: spinCoin 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* Gold highlight accents */
+        .gold-accent {
+            color: #bfa15f;
+        }
+        
+        /* Shaking dynamic elements for interactive fun */
+        @keyframes subtleOscillate {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+        .zen-float {
+            animation: subtleOscillate 4s ease-in-out infinite;
+        }
+
+        @keyframes spinSlow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+            animation: spinSlow 40s linear infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-[#a61b29]/10 selection:text-[#a61b29] overflow-hidden">
+
+    <!-- React App Root Container -->
+    <div id="root" class="flex-grow flex flex-col h-screen"></div>
+
+    <!-- React and Babel CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- React Implementation -->
+    <script type="text/babel">
+        const { useState, useEffect, useMemo, useRef } = React;
+
+        // Native Web Audio API Synthesizer - Generates meditational Singing Bowl sound
+        function playZenChime() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                const ctx = new AudioContext();
+                const now = ctx.currentTime;
+
+                const oscillators = [
+                    { freq: 144, gain: 0.5, decay: 4.5 },   
+                    { freq: 144 * 2.76, gain: 0.2, decay: 3.5 }, 
+                    { freq: 144 * 4.4, gain: 0.15, decay: 2.5 },  
+                    { freq: 144 * 5.4, gain: 0.1, decay: 1.5 }    
+                ];
+
+                const masterFilter = ctx.createBiquadFilter();
+                masterFilter.type = 'lowpass';
+                masterFilter.frequency.setValueAtTime(900, now);
+                masterFilter.Q.setValueAtTime(1, now);
+                masterFilter.connect(ctx.destination);
+
+                oscillators.forEach(oscSpec => {
+                    const osc = ctx.createOscillator();
+                    const gainNode = ctx.createGain();
+
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(oscSpec.freq, now);
+                    
+                    const lfo = ctx.createOscillator();
+                    const lfoGain = ctx.createGain();
+                    lfo.frequency.setValueAtTime(5.8 + Math.random(), now); 
+                    lfoGain.gain.setValueAtTime(1.5, now); 
+                    lfo.connect(lfoGain);
+                    lfoGain.connect(osc.frequency);
+
+                    osc.connect(gainNode);
+                    gainNode.connect(masterFilter);
+
+                    gainNode.gain.setValueAtTime(0, now);
+                    gainNode.gain.linearRampToValueAtTime(oscSpec.gain, now + 0.08); 
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + oscSpec.decay); 
+
+                    lfo.start(now);
+                    osc.start(now);
+
+                    lfo.stop(now + oscSpec.decay);
+                    osc.stop(now + oscSpec.decay);
+                });
+            } catch (err) {
+                console.log("Audio play blocked until human interaction.");
+            }
+        }
+
+        const TRIGRAMS = {
+            "乾": { name: "乾", nature: "天", lines: [1, 1, 1], symbol: "☰" },
+            "兌": { name: "兌", nature: "澤", lines: [1, 1, 0], symbol: "☱" },
+            "離": { name: "離", nature: "火", lines: [1, 0, 1], symbol: "☲" },
+            "震": { name: "震", nature: "雷", lines: [1, 0, 0], symbol: "☳" },
+            "巽": { name: "巽", nature: "風", lines: [0, 1, 1], symbol: "☴" },
+            "坎": { name: "坎", nature: "水", lines: [0, 1, 0], symbol: "☵" },
+            "艮": { name: "艮", nature: "山", lines: [0, 0, 1], symbol: "☶" },
+            "坤": { name: "坤", nature: "地", lines: [0, 0, 0], symbol: "☷" }
+        };
+
+        const HEXAGRAMS_SPECS = [
+            { id: 1, name: "乾", upper: "乾", lower: "乾", guaci: "元、亨、利、貞。", xiangci: "天行健，君子以自強不息。", lines_ci: ["潛龍勿用。", "見龍在田，利見大人。", "君子終日乾乾，夕惕若，厲无咎。", "或躍在淵，无咎。", "飛龍在天，利見大人。", "亢龍有悔。"], zen_tips: "乾卦純陽剛烈，代表純粹的能量與創造力。修行者此時當發大願心，精進不懈，但亦須注意初爻之潛藏與上爻之戒驕慢。" },
+            { id: 2, name: "坤", upper: "坤", lower: "坤", guaci: "元亨，利牝馬之貞。君子有攸往，先迷後得，主利。西南得朋，東北喪朋，安貞吉。", xiangci: "地勢坤，君子以厚德載物。", lines_ci: ["履霜，堅冰至。", "直方大，不習无不利。", "含章可貞，或從王事，无成有終。", "括囊，无咎无譽。", "黃裳，元吉。", "龍戰于野，其血玄黃。"], zen_tips: "坤卦代表至柔至順。修道首重「大地之德」，包容萬物，順應天時。不要搶在前面主導，而應當安靜跟隨，守持靜觀。" },
+            { id: 3, name: "屯", upper: "坎", lower: "震", guaci: "元、亨、利、貞。勿用有攸往，利建侯。", xiangci: "雲雷，屯；君子以經綸。", lines_ci: ["磐桓，利居貞，利建侯。", "屯如邅如，乘馬班如。匪寇婚媾，女子貞不字，十年乃字。", "即鹿无虞，惟入于林中。君子幾不如舍，往吝。", "乘馬班如，求婚媾。往，吉无不利。", "屯其膏。小貞吉，大貞凶。", "乘馬班如，泣血漣如。"], zen_tips: "屯卦為剛柔交始，萬物初生之艱難。猶如破土萌芽之種子，雖然面臨壓力，但生機無限。切忌急躁，宜安守定力。" },
+            { id: 4, name: "蒙", upper: "艮", lower: "坎", guaci: "亨。匪我求童蒙，童蒙求我。初筮告，再三瀆，瀆則不告。利貞。", xiangci: "山下出泉，蒙；君子以果行育德。", lines_ci: ["發蒙，利用刑人，用說桎梏，以往吝。", "包蒙吉，納婦吉，子克家。", "勿用取女，見金夫，不有躬，无攸利。", "困蒙，吝。", "童蒙，吉。", "擊蒙，不利為寇，利禦寇。"], zen_tips: "蒙卦象徵矇矓初啟。修行在於「破愚啟智」。要以謙和恭敬之誠意向明師求教，而不是自以為是。以清淨心破除心靈的迷霧。" },
+            { id: 5, name: "需", upper: "坎", lower: "乾", guaci: "有孚，光亨，貞吉。利涉大川。", xiangci: "雲上於天，需；君子以飲食宴樂。", lines_ci: ["需于郊，利用恆，无咎。", "需于沙，小有言，終吉。", "需于泥，致寇至。", "需于血，出自穴。", "需于酒食，貞吉。", "入于穴，有不速之客三人來，敬之終吉。"], zen_tips: "需卦意為等待與蓄勢。前方雖有險阻（坎），但若有充足的剛健之氣（乾），便不應冒險進取。此時當身心放鬆，在「飲食宴樂」中保養元氣，靜待時機。" },
+            { id: 6, name: "訟", upper: "乾", lower: "坎", guaci: "有孚，窒。惕中吉，終凶。利見大人，不利涉大川。", xiangci: "天與水違行，訟；君子以作事謀始。", lines_ci: ["不永所事，小有言，終吉。", "不克訟，歸而逋，其邑人三百戶，无眚。", "食舊德，貞厲，終吉。或從王事，无成。", "不克訟，復即命渝，安貞吉。", "訟，元吉。", "或錫之鞶帶，終朝三褫之。"], zen_tips: "訟卦代表相違。內險而外剛健，必然引起爭端。在修行上，爭訟皆是執著於「我相」而起。退一步海闊天空，及早熄滅嗔恨與爭鬥之心。" },
+            { id: 7, name: "師", upper: "坤", lower: "坎", guaci: "貞，丈人吉，无咎。", xiangci: "地中有水，師；君子以容民畜眾。", lines_ci: ["師出以律，否臧凶。", "在師中吉，无咎，王三錫命。", "師或輿尸，凶。", "師左次，无咎。", "田有禽，利執言，无咎. 長子帥師，弟子輿尸，貞凶。", "大君有命，開國承家，小人勿用。"], zen_tips: "師卦象徵紀律與統御。地底暗藏洶湧之水。修行是一場與內心「煩惱魔」作戰的戰役。必須有極其嚴格的「戒律」與「專注力」來引導，方能降伏內心。" },
+            { id: 8, name: "比", upper: "坎", lower: "坤", guaci: "吉。原筮元永貞，无咎。不寧方來，後夫凶。", xiangci: "地上有水，比；先王以建萬國，親諸侯。", lines_ci: ["有孚比之，无咎。有孚盈缶，終來有它，吉。", "比之自內，貞吉。", "比之匪人。", "外比之，貞吉。", "顯比，王用三驅，失前禽。邑人不誡，吉。", "比之无首，凶。"], zen_tips: "比卦意為親輔、融合。水流地上，大地滋潤。修行非孤芳自賞，而是與法界一切眾生相應相通。尋求同願同行的「法侶」共修，以大慈大悲之心包容一切。" },
+            { id: 9, name: "小畜", upper: "巽", lower: "乾", guaci: "亨。密雲不雨，自我西郊。", xiangci: "風行天上，小畜；君子以懿文德。", lines_ci: ["復自道，何其咎，吉。", "牽復，吉。", "輿說輻，夫妻反目。", "有孚，血去惕出，无咎。", "有孚攣如，富以其鄰。", "既雨既處，尚德載，婦貞厲。月幾望，君子征凶。"], zen_tips: "小畜卦代表微小的積蓄。雖然「密雲不雨」，但生機正在蓄積。修持此卦者，不宜急於求大成就，應從小處做起，注重當下的一呼吸、一念頭，調順內心風息。" },
+            { id: 10, name: "履", upper: "乾", lower: "兌", guaci: "履虎尾，不咥人，亨。", xiangci: "上天下澤，履；君子以辨上下，定民志。", lines_ci: ["素履，往，无咎。", "履道坦坦，幽人貞吉。", "眇能視，跛能履，履虎尾，咥人，凶。武人為于大君。", "履虎尾，愬愬，終吉。", "夬履，貞厲。", "視履考祥，其旋元吉。"], zen_tips: "履卦意為履行與禮儀。踩在老虎尾巴上，若能柔順應對，老虎也不會咬人。這是在紅塵修行、隨緣度眾的極致智慧。無論世俗局勢多凶險，只要心存謙遜禮敬，便能化險為夷。" },
+            { id: 11, name: "泰", upper: "坤", lower: "乾", guaci: "小往大來，吉亨。", xiangci: "天地交，泰；后以財成天地之道，輔相天地之宜，以左右民。", lines_ci: ["拔茅茹，以其彙，征吉。", "包荒，用馮河，不遐遺，朋亡，得尚于中行。", "无平不陂，无往不復，艱貞无咎。勿恤其孚，于食有福。", "翩翩，不富以其鄰，不戒以孚。", "帝乙歸妹，以祉元吉。", "城復于隍，勿用師。自邑告命，貞吝。"], zen_tips: "泰卦代表天地交泰，萬物亨通。天降其氣，地承其養。此為修行的大平靜期，福慧雙增。然而「无平不陂，无往不復」，身處順境亦要時時反觀自省，防止因懈怠而下滑。" },
+            { id: 12, name: "否", upper: "乾", lower: "坤", guaci: "否之匪人，不利君子貞，大往小來。", xiangci: "天地不交，否；君子以儉德辟難，不可榮以祿。", lines_ci: ["拔茅茹，以其彙，貞吉，亨。", "包承。小人吉，大人否亨。", "包羞。", "有命无咎，疇離祉。", "休否，大人吉. 其亡其亡，繫于苞桑。", "傾否，先否後喜。"], zen_tips: "否卦為天地不交，萬物不通。此乃修行之「暗夜」或瓶頸期，小人道長，阻礙極多。此時當「儉德辟難」，收斂鋒芒，不求名利，潛心內省修煉，靜等痞塞消解。" },
+            { id: 13, name: "同人", upper: "乾", lower: "離", guaci: "同人于野，亨。利涉大川，利君子貞。", xiangci: "天與火，同人；君子以類族辨物。", lines_ci: ["同人于門，无咎。", "同人于宗，吝。", "伏戎于莽，升其高陵，三歲不興。", "乘其墉，弗克攻，吉。", "同人，先號咷而後笑。大師克相遇。", "同人于郊，无悔。"], zen_tips: "同人卦象徵大同與無私。光明普照，天火同輝。修行者當打破門戶之見與宗派之執（避免「同人于宗」），以虛空般的心量，廣度一切有情，與十方三世眾生同心同體。" },
+            { id: 14, name: "大有", upper: "離", lower: "乾", guaci: "元亨。", xiangci: "火在天上，大有；君子以遏惡揚善，順天休命。", lines_ci: ["无交害，匪咎，艱則无咎。", "大車以載，有攸往，无咎。", "公用亨于天子，小人弗克。", "匪其彭，无咎。", "厥孚交如，威如；吉。", "自天祐之，吉无不利。"], zen_tips: "大有卦代表大為富有、光芒耀眼。雖處高位，但心繫天下。修道有成或世法發達時，不可生傲慢。當「遏惡揚善」，利益大眾，以此清淨功功德迴向法界，必能「自天祐之」。" },
+            { id: 15, name: "謙", upper: "坤", lower: "艮", guaci: "亨，君子有終。", xiangci: "地中有山，謙；君子以裒多益寡，稱物平施。", lines_ci: ["謙謙君子，用涉大川，吉。", "鳴謙，貞吉。", "勞謙君子，萬民服，吉。", "无不利，撝謙。", "不富以其鄰，利用侵伐，无不利。", "鳴謙，利用行師，征邑國。"], zen_tips: "謙卦是易經中「唯一六爻皆吉」之卦。高山隱入地底。這代表了修行者的最高境界——「無我」。越是有大德大能，心境越是卑下柔和。謙虛是通往證悟最安全的捷徑。" },
+            { id: 16, name: "豫", upper: "震", lower: "坤", guaci: "利建侯行師。", xiangci: "雷出地奮，豫。先王以作樂崇德，殷薦之上帝，以配祖考。", lines_ci: ["鳴豫，凶。", "介于石，不終日，貞吉。", "盱豫，悔。遲有悔。", "由豫，大有得. 勿疑. 朋盍簪。", "貞疾，恆不死。", "冥豫，成有渝，无咎。"], zen_tips: "豫卦代表喜悅與順應。內心順從，外在震動激發。修行者此時容易感到法喜充滿。但需防過度安逸流於放縱、迷失（「冥豫」）。當如「介于石」般保持覺照之敏銳。" },
+            { id: 17, name: "隨", upper: "兌", lower: "震", guaci: "元亨利貞，无咎。", xiangci: "澤中有雷，隨；君子以嚮晦入宴息。", lines_ci: ["官有渝，貞吉。出門交有功。", "係小子，失丈夫。", "係丈夫，失小子. 隨有求得，利居貞。", "隨有獲，貞凶. 有孚在道，以明，何咎。", "孚于嘉，吉。", "拘係之，乃從維之. 王用亨于西山。"], zen_tips: "隨卦象徵順應、隨緣。雷入澤中，順理而行。在修行上，這是「隨緣不變，不變隨緣」的無上法門。不要死板對抗世俗，而是要學會因材施教，在隨緣妙用中度化眾生。" },
+            { id: 18, name: "蠱", upper: "艮", lower: "巽", guaci: "元亨，利涉大川. 先甲三日，後甲三日。", xiangci: "山下有風，蠱；君子以振民育德。", lines_ci: ["幹父之蠱，有子，考无咎，厲終吉。", "幹母之蠱，不可貞。", "幹父之蠱，小有悔，无大咎。", "裕父之蠱，往見吝。", "幹父之蠱，用譽。", "不事王侯，高尚其事。"], zen_tips: "蠱卦意為敗壞、需要整治。修持此卦代表內心深處堆積了陳舊的煩惱垢障。不能再逃避，當痛下決心掃除「貪、嗔、癡、慢、疑」等五毒。終則有始，重獲清淨新生。" },
+            { id: 19, name: "臨", upper: "坤", lower: "兌", guaci: "元亨利貞. 至於八月有凶。", xiangci: "澤上有地，臨；君子以教思无窮，容保民无疆。", lines_ci: ["咸臨，貞吉。", "咸臨，吉无不利。", "甘臨，无攸利. 既憂之，无咎。", "至臨，无咎。", "知臨，大君之宜，吉。", "敦臨，吉，无咎。"], zen_tips: "臨卦象徵親臨、向下關懷。地勢高臨，澤水在下。修道者當慈悲下濟，深入基層弘法度生。然而「至於八月有凶」，好運不會永無止境，須有憂患意識，未雨綢繆。" },
+            { id: 20, name: "觀", upper: "巽", lower: "坤", guaci: "盥而不薦，有孚顒若。", xiangci: "風行地上，觀；先王以省方，觀民設教。", lines_ci: ["童觀，小人无咎，君子吝。", "闚觀，利女貞。", "觀我生，進退。", "觀國之光，利用賓于王。", "觀我生，君子无咎。", "觀其生，君子无咎。"], zen_tips: "觀卦是極具禪意的一卦，代表「禪觀」與「省察」。如風拂大地。修行首重「觀照內心」與「返聞自性」。洗手後尚未獻祭之時，內心最是純淨虔誠。持此正念，洞察宇宙人生本質。" }
+        ];
+
+        const ALL_HEXAGRAMS = (() => {
+            const tempSpecs = [...HEXAGRAMS_SPECS];
+            const remainingNames = [
+                { id: 21, name: "噬嗑", upper: "離", lower: "震", guaci: "亨。利用獄。", xiangci: "雷電噬嗑，先王以明罰敕法。" },
+                { id: 22, name: "賁", upper: "艮", lower: "離", guaci: "亨。小利有攸往。", xiangci: "山下有火，賁，君子以明庶政，无敢折獄。" },
+                { id: 23, name: "剝", upper: "艮", lower: "坤", guaci: "不利有攸往。", xiangci: "山附於地，剝，上以厚下安宅。" },
+                { id: 24, name: "復", upper: "坤", lower: "震", guaci: "亨。出入无疾，朋來无咎。反復其道，七日來復。利有攸往。", xiangci: "雷在地中，復，先王以至日閉關，商旅不行，后不省方。" },
+                { id: 25, name: "无妄", upper: "乾", lower: "震", guaci: "元亨，利貞。其匪正有眚，不利有攸往。", xiangci: "天下雷行，物與无妄，先王以茂對時，育萬物。" },
+                { id: 26, name: "大畜", upper: "艮", lower: "乾", guaci: "利貞。不家食吉，利涉大川。", xiangci: "天在山中，大畜，君子以多識前言往行，以畜其德。" },
+                { id: 27, name: "頤", upper: "艮", lower: "震", guaci: "貞吉. 觀頤，自求口實。", xiangci: "山下有雷，頤，君子以慎言語，節飲食。" },
+                { id: 28, name: "大過", upper: "兌", lower: "巽", guaci: "棟橈。利有攸往，亨。", xiangci: "澤滅木，大過，君子以獨立不懼，遯世无悶。" },
+                { id: 29, name: "坎", upper: "坎", lower: "坎", guaci: "習坎，有孚，維心亨，行有尚。", xiangci: "水洊至，習坎，君子以常德行，習教事。" },
+                { id: 30, name: "離", upper: "離", lower: "離", guaci: "利貞，亨。畜牝牛，吉。", xiangci: "明兩作，離，大人以繼明照於四方。" },
+                { id: 31, name: "咸", upper: "兌", lower: "艮", guaci: "亨，利貞，取女吉。", xiangci: "山上有澤，咸，君子以虛受人。" },
+                { id: 32, name: "恆", upper: "震", lower: "巽", guaci: "亨，无咎，利貞，利有攸往。", xiangci: "雷風恆，君子以立不易方。" },
+                { id: 33, name: "遯", upper: "乾", lower: "艮", guaci: "亨，小利貞。", xiangci: "天下有山，遯，君子以遠小人，不惡而嚴。" },
+                { id: 34, name: "大壯", upper: "震", lower: "乾", guaci: "利貞。", xiangci: "雷在天上，大壯，君子以非禮弗履。" },
+                { id: 35, name: "晉", upper: "離", lower: "坤", guaci: "康侯用錫馬蕃庶，晝日三接。", xiangci: "明出地上，晉，君子以自昭明德。" },
+                { id: 36, name: "明夷", upper: "坤", lower: "離", guaci: "利艱貞。", xiangci: "明入地中，明夷，君子以蒞眾，用晦而明。" },
+                { id: 37, name: "家人", upper: "巽", lower: "離", guaci: "利女貞。", xiangci: "風自火出，家人，君子以言有物，而行有恆。" },
+                { id: 38, name: "睽", upper: "離", lower: "兌", guaci: "小事吉。", xiangci: "上火下澤，睽，君子以同而異。" },
+                { id: 39, name: "蹇", upper: "坎", lower: "艮", guaci: "利西南，不利東北. 利見大人，貞吉。", xiangci: "山上有水，蹇, 君子以反身修德。" },
+                { id: 40, name: "解", upper: "震", lower: "坎", guaci: "利西南. 无所往，其來復吉；有攸往，夙吉。", xiangci: "雷雨作，解，君子以赦過宥罪。" },
+                { id: 41, name: "損", upper: "艮", lower: "兌", guaci: "有孚，元吉，无咎，可貞，利有攸往。曷之用？二簋可用享。", xiangci: "山下有澤，損，君子以懲忿窒欲。" },
+                { id: 42, name: "益", upper: "巽", lower: "震", guaci: "利有攸往，利涉大川。", xiangci: "風雷益，君子以見善則遷，有過則改。" },
+                { id: 43, name: "夬", upper: "兌", lower: "乾", guaci: "揚於王庭，孚號，有厲. 告自邑，不利即戎，利有攸往。", xiangci: "澤上於天，夬，君子以施祿及下，居德則忌。" },
+                { id: 44, name: "姤", upper: "乾", lower: "巽", guaci: "女壯，勿用取女。", xiangci: "天下有風，姤，后以施命誥四方。" },
+                { id: 45, name: "萃", upper: "兌", lower: "坤", guaci: "亨. 王假有廟，利見大人，亨，利貞. 用大牲吉，利有攸往。", xiangci: "澤上於地，萃，君子以除戎器，戒不虞。" },
+                { id: 46, name: "升", upper: "坤", lower: "巽", guaci: "元亨. 用見大人，勿恤. 南征吉。", xiangci: "地中生木，升，君子以順德，積小以高大。" },
+                { id: 47, name: "困", upper: "兌", lower: "坎", guaci: "亨，貞，大人吉，无咎. 有言不信。", xiangci: "澤无水，困，君子以致命遂志。" },
+                { id: 48, name: "井", upper: "坎", lower: "巽", guaci: "改邑不改井，无喪无得，往來井井. 汔至，亦未繘井，贏其瓶，凶。", xiangci: "木上有水，井, 君子以勞民勸相。" },
+                { id: 49, name: "革", upper: "兌", lower: "離", guaci: "己日乃孚，元亨，利貞，悔亡。", xiangci: "澤中有火，革，君子以治曆明時。" },
+                { id: 50, name: "鼎", upper: "離", lower: "巽", guaci: "元吉，亨。", xiangci: "木上有火，鼎，君子以正位凝命。" },
+                { id: 51, name: "震", upper: "震", lower: "震", guaci: "亨. 震來虩虩，笑言啞啞. 震驚百里，不喪匕鬯。", xiangci: "洊雷，震，君子以恐懼修省。" },
+                { id: 52, name: "艮", upper: "艮", lower: "艮", guaci: "艮其背，不獲其身，行其庭，不見其人，无咎。", xiangci: "兼山，艮，君子以思不出其位。" },
+                { id: 53, name: "漸", upper: "巽", lower: "艮", guaci: "女歸吉，利貞。", xiangci: "山上有木，漸，君子以居賢德，善俗。" },
+                { id: 54, name: "歸妹", upper: "震", lower: "兌", guaci: "征凶，无攸利。", xiangci: "澤上有雷，歸妹，君子以永終知敝。" },
+                { id: 55, name: "豐", upper: "震", lower: "離", guaci: "亨，王假之，勿憂，宜日中。", xiangci: "雷電皆至，豐，君子以折獄致刑。" },
+                { id: 56, name: "旅", upper: "離", lower: "艮", guaci: "小亨，旅貞吉。", xiangci: "山上有火，旅，君子以明慎用刑，而不留獄。" },
+                { id: 57, name: "巽", upper: "巽", lower: "巽", guaci: "小亨，利攸往，利見大人。", xiangci: "隨風，巽，君子以申命行事。" },
+                { id: 58, name: "兌", upper: "兌", lower: "兌", guaci: "亨，利貞。", xiangci: "麗澤，兌，君子以朋友講習。" },
+                { id: 59, name: "渙", upper: "巽", lower: "坎", guaci: "亨. 王假有廟，利涉大川，利貞。", xiangci: "風行水上，渙，先王以享於帝，立廟。" },
+                { id: 60, name: "節", upper: "坎", lower: "兌", guaci: "亨. 苦節不可貞。", xiangci: "澤上有水，節，君子以制數度，議德行。" },
+                { id: 61, name: "中孚", upper: "巽", lower: "兌", guaci: "豚魚吉，利涉大川，利貞。", xiangci: "澤上有風，中孚，君子以議獄緩死。" },
+                { id: 62, name: "小過", upper: "震", lower: "艮", guaci: "亨，利貞. 可小事，不可大事. 飛鳥遺之音，不宜上，宜下，大吉。", xiangci: "山上有雷，小過，君子以行過乎恭，喪過乎哀，用過乎儉。" },
+                { id: 63, name: "既濟", upper: "坎", lower: "離", guaci: "亨，小利貞. 初吉終亂。", xiangci: "水在火上，既濟, 君子以思患而預防之。" },
+                { id: 64, name: "未濟", upper: "離", lower: "坎", guaci: "亨. 小狐汔濟，濡其尾，无攸利。", xiangci: "火在水上，未濟，君子以慎辨物，居方。" }
+            ];
+
+            const fallbackLines = (h) => [
+                `初${h.lower === "坤" ? "六" : "九"}，得時而起，戒驕戒躁。`,
+                `二${h.lower === "坤" ? "六" : "九"}，得中中正，行有餘慶。`,
+                `三${h.lower === "坤" ? "六" : "九"}，處過渡之時，惕厲無咎。`,
+                `四${h.lower === "坤" ? "六" : "九"}，近臨高位，守謙保泰。`,
+                `五${h.lower === "坤" ? "六" : "九"}，中正尊榮，大吉大利。`,
+                `上${h.lower === "坤" ? "六" : "九"}，物極必反，防盛極而衰。`
+            ];
+
+            const fallbackTips = (h) => {
+                const naturalName = h.upper === h.lower 
+                    ? `${h.name}為${TRIGRAMS[h.upper].nature}` 
+                    : `${TRIGRAMS[h.upper].nature}${TRIGRAMS[h.lower].nature}${h.name}`;
+                return `【${naturalName}卦】，由【${h.upper}（${TRIGRAMS[h.upper].nature}）】與【${h.lower}（${TRIGRAMS[h.lower].nature}）】相疊而成。象徵${TRIGRAMS[h.upper].nature}與${TRIGRAMS[h.lower].nature}之法界交會。`;
+            };
+
+            remainingNames.forEach(item => {
+                const specIndex = tempSpecs.findIndex(s => s.id === item.id);
+                if (specIndex === -1) {
+                    tempSpecs.push({
+                        ...item,
+                        lines_ci: fallbackLines(item),
+                        zen_tips: fallbackTips(item)
+                    });
+                }
+            });
+
+            tempSpecs.sort((a, b) => a.id - b.id);
+
+            return tempSpecs.map(spec => {
+                const lowerLines = TRIGRAMS[spec.lower].lines;
+                const upperLines = TRIGRAMS[spec.upper].lines;
+                const binary = [...lowerLines, ...upperLines]; 
+                
+                const naturalName = spec.upper === spec.lower 
+                    ? `${spec.name}為${TRIGRAMS[spec.upper].nature}` 
+                    : `${TRIGRAMS[spec.upper].nature}${TRIGRAMS[spec.lower].nature}${spec.name}`;
+
+                return {
+                    ...spec,
+                    binary,
+                    naturalName,
+                    unicode: String.fromCharCode(0x4DC0 + spec.id - 1)
+                };
+            });
+        })();
+
+        const PURE_TRIGRAMS = ["乾", "震", "坎", "艮", "坤", "巽", "離", "兌"];
+        const GEN_NAMES = ["本宮卦", "一世卦", "二世卦", "三世卦", "四世卦", "五世卦", "遊魂卦", "歸魂卦"];
+        
+        const getPalaceMap = () => {
+            const map = {}; 
+            PURE_TRIGRAMS.forEach(pName => {
+                const lines = TRIGRAMS[pName].lines; 
+                const p = [...lines, ...lines]; 
+                
+                const gens = [
+                    [p[0], p[1], p[2], p[3], p[4], p[5]], 
+                    [1-p[0], p[1], p[2], p[3], p[4], p[5]], 
+                    [1-p[0], 1-p[1], p[2], p[3], p[4], p[5]], 
+                    [1-p[0], 1-p[1], 1-p[2], p[3], p[4], p[5]], 
+                    [1-p[0], 1-p[1], 1-p[2], 1-p[3], p[4], p[5]], 
+                    [1-p[0], 1-p[1], 1-p[2], 1-p[3], 1-p[4], p[5]], 
+                    [1-p[0], 1-p[1], 1-p[2], p[3], 1-p[4], p[5]], 
+                    [p[0], p[1], p[2], p[3], 1-p[4], p[5]] 
+                ];
+                
+                gens.forEach((genBin, idx) => {
+                    const key = genBin.join("");
+                    map[key] = { palace: pName, genIndex: idx, genName: GEN_NAMES[idx] };
+                });
+            });
+            return map;
+        };
+
+        const PALACE_MAP = getPalaceMap();
+
+        function App() {
+            const [selectedId, setSelectedId] = useState(1); 
+            const [searchTerm, setSearchTerm] = useState("");
+            const [activeLine, setActiveLine] = useState(null);
+            
+            // Mobile Navigation and Tabs System
+            const [activeTab, setActiveTab] = useState("details"); // 'search', 'palaces', 'divine', 'details'
+            const [activePalace, setActivePalace] = useState("乾");
+            
+            // Interactive Divination States
+            const [coins, setCoins] = useState([1, 1, 1]); 
+            const [isShaking, setIsShaking] = useState(false);
+            const [shakeStep, setShakeStep] = useState(0); // 0 to 6
+            const [shakedLines, setShakedLines] = useState([]); // Array of { sum, type, isYang, isChange }
+            const [divinedHexId, setDivinedHexId] = useState(null);
+            const [divinedChangeHexId, setDivinedChangeHexId] = useState(null);
+
+            // Notification / Toast State
+            const [toast, setToast] = useState(null);
+
+            // AI Oracle interaction state
+            const [userQuestion, setUserQuestion] = useState("");
+            const [oracleResponse, setOracleResponse] = useState("");
+            const [isOracleLoading, setIsOracleLoading] = useState(false);
+
+            const currentHex = useMemo(() => {
+                return ALL_HEXAGRAMS.find(h => h.id === selectedId) || ALL_HEXAGRAMS[0];
+            }, [selectedId]);
+
+            const showToast = (message) => {
+                setToast(message);
+                setTimeout(() => setToast(null), 4000);
+            };
+
+            const selectHexagram = (id, tabToGo = "details") => {
+                setSelectedId(id);
+                setActiveLine(null);
+                setActiveTab(tabToGo);
+                playZenChime();
+            };
+
+            const getHexByBinary = (binArr) => {
+                const binStr = binArr.join("");
+                return ALL_HEXAGRAMS.find(h => h.binary.join("") === binStr) || null;
+            };
+
+            const cuoHex = useMemo(() => {
+                const bin = currentHex.binary.map(l => 1 - l);
+                return getHexByBinary(bin);
+            }, [currentHex]);
+
+            const zongHex = useMemo(() => {
+                const bin = [...currentHex.binary].reverse();
+                return getHexByBinary(bin);
+            }, [currentHex]);
+
+            const fuHex = useMemo(() => {
+                const bin = [currentHex.binary[1], currentHex.binary[2], currentHex.binary[3], currentHex.binary[4], currentHex.binary[5], currentHex.binary[0]];
+                return getHexByBinary(bin);
+            }, [currentHex]);
+
+            const zaHex = useMemo(() => {
+                const b = currentHex.binary;
+                const bin = [b[1], b[2], b[3], b[2], b[3], b[4]];
+                return getHexByBinary(bin);
+            }, [currentHex]);
+
+            const polarOne = useMemo(() => {
+                const b = currentHex.binary;
+                const bin = [b[0], b[1], b[2], b[1], b[2], b[3]];
+                return getHexByBinary(bin);
+            }, [currentHex]);
+
+            const polarTwo = useMemo(() => {
+                const b = currentHex.binary;
+                const bin = [b[1], b[2], b[3], b[2], b[3], b[4]];
+                return getHexByBinary(bin);
+            }, [currentHex]);
+
+            const polarThree = useMemo(() => {
+                const b = currentHex.binary;
+                const bin = [b[2], b[3], b[4], b[3], b[4], b[5]];
+                return getHexByBinary(bin);
+            }, [currentHex]);
+
+            const filteredHexagrams = useMemo(() => {
+                if (!searchTerm.trim()) return ALL_HEXAGRAMS;
+                const term = searchTerm.toLowerCase();
+                return ALL_HEXAGRAMS.filter(h => 
+                    h.name.includes(term) || 
+                    String(h.id) === term ||
+                    h.naturalName.includes(term) ||
+                    `${TRIGRAMS[h.upper].nature}${TRIGRAMS[h.lower].nature}`.includes(term) ||
+                    `${h.upper}${h.lower}`.includes(term)
+                );
+            }, [searchTerm]);
+
+            const shakeCoins = () => {
+                if (shakeStep >= 6) return;
+                setIsShaking(true);
+                playZenChime();
+
+                setTimeout(() => {
+                    const roll = [Math.floor(Math.random() * 2), Math.floor(Math.random() * 2), Math.floor(Math.random() * 2)];
+                    setCoins(roll);
+                    
+                    const sum = roll.reduce((acc, curr) => acc + (curr === 1 ? 3 : 2), 0);
+                    let isYang = true;
+                    let isChange = false;
+                    
+                    if (sum === 6) { isYang = false; isChange = true; } 
+                    else if (sum === 7) { isYang = true; isChange = false; }
+                    else if (sum === 8) { isYang = false; isChange = false; }
+                    else if (sum === 9) { isYang = true; isChange = true; }
+
+                    const newLine = { sum, isYang, isChange };
+                    const nextLines = [...shakedLines, newLine];
+                    setShakedLines(nextLines);
+                    const nextStep = shakeStep + 1;
+                    setShakeStep(nextStep);
+                    setIsShaking(false);
+
+                    if (nextStep === 6) {
+                        const originalBin = nextLines.map(l => l.isYang ? 1 : 0);
+                        const changedBin = nextLines.map(l => {
+                            if (l.isChange) {
+                                return l.isYang ? 0 : 1; 
+                            }
+                            return l.isYang ? 1 : 0;
+                        });
+
+                        const bHex = getHexByBinary(originalBin);
+                        const cHex = getHexByBinary(changedBin);
+                        if (bHex) setDivinedHexId(bHex.id);
+                        if (cHex) setDivinedChangeHexId(cHex.id);
+                        
+                        showToast(`靈錢起卦圓滿！本卦：${bHex?.naturalName || "未知"}，之卦：${cHex?.naturalName || "未知"}`);
+                    }
+                }, 800);
+            };
+
+            const resetDivination = () => {
+                setShakeStep(0);
+                setShakedLines([]);
+                setDivinedHexId(null);
+                setDivinedChangeHexId(null);
+                showToast("神案已清淨，可重新請靈起卦。");
+            };
+
+            const quickDivine = () => {
+                playZenChime();
+                const tempLines = [];
+                for (let i = 0; i < 6; i++) {
+                    const rand = Math.random();
+                    let sum = 7;
+                    if (rand < 0.125) sum = 6;
+                    else if (rand < 0.5) sum = 7;
+                    else if (rand < 0.875) sum = 8;
+                    else sum = 9;
+
+                    const isYang = (sum === 7 || sum === 9);
+                    const isChange = (sum === 6 || sum === 9);
+                    tempLines.push({ sum, isYang, isChange });
+                }
+
+                setShakedLines(tempLines);
+                setShakeStep(6);
+
+                const originalBin = tempLines.map(l => l.isYang ? 1 : 0);
+                const changedBin = tempLines.map(l => l.isChange ? (l.isYang ? 0 : 1) : (l.isYang ? 1 : 0));
+
+                const bHex = getHexByBinary(originalBin);
+                const cHex = getHexByBinary(changedBin);
+                if (bHex) setDivinedHexId(bHex.id);
+                if (cHex) setDivinedChangeHexId(cHex.id);
+
+                showToast(`一鍵感應功成！得卦「${bHex?.naturalName || "未知"}」`);
+            };
+
+            const askAbbotOracle = async (presetQuestion = "") => {
+                const questionToAsk = presetQuestion || userQuestion;
+                if (!questionToAsk.trim()) return;
+
+                setIsOracleLoading(true);
+                setOracleResponse("");
+                playZenChime();
+
+                const apiKey = ""; // Runtime automatically provisions the API key.
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+                const systemPrompt = `你是一位精通漢傳佛教、禪宗公案、密宗大圓滿心法與《易經》的禪密修道院長老。
+對於弟子提出的世俗疑難、禪修障礙或命運祈問，請以「禪宗密宗修道院」長老之超然、圓融、慈悲視角進行解答。
+請深度結合弟子「當前所問」與他們「目前點選的易經卦象（${currentHex.naturalName}卦）」進行分析。
+你需要融會貫通以下易經變動維度：
+1. 本卦（代表當下狀態）：${currentHex.naturalName}（${currentHex.guaci}）。
+2. 錯卦（代表對立反面與隱藏盲點）：${cuoHex ? cuoHex.naturalName : "無"}。
+3. 綜卦（代表換位思考與處境轉換）：${zongHex ? zongHex.naturalName : "無"}。
+4. 復卦（代表時間演進與循環往復）：${fuHex ? fuHex.naturalName : "無"}。
+5. 互卦/雜卦（代表內部本質與交織複雜）：${zaHex ? zaHex.naturalName : "無"}。
+6. 六爻三極卦（代表天人地三極之演化階段）：第一極（${polarOne?.naturalName}）、第二極（${polarTwo?.naturalName}）、第三極（${polarThree?.naturalName}）。
+
+請生成一篇結構嚴謹、文風古雅而溫慢的禪密開示：
+- 第一部分：【禪林法界觀照】：慈悲接引弟子的問題，以一首空靈的禪詩或開示引導內心安頓。
+- 第二部分：【卦象變局密鑰】：深度剖析本卦與錯綜複雜三卦的交織演化，如何直指當前問題的根源（對立面、轉化契機與核心盲點）。
+- 第三部分：【三極天演軌跡】：透析三個三極極卦，梳理這件事情從萌芽（極一）、核心運作（極二）到最終歸宿（極三）的流轉局勢。
+- 第四部分：【禪宗密宗修行印心指引】：給出切實的觀照心法（例如一句心咒、一個觀照要訣或呼吸調順法），指引弟子轉識成智。
+
+請使用富含古風文筆、優美的繁體中文Markdown格式排版。`;
+
+                const userPrompt = `弟子提問：\n「${questionToAsk}」\n請長老慈悲印心，開示迷津。`;
+
+                let delay = 1000;
+                for (let attempt = 0; attempt < 5; attempt++) {
+                    try {
+                        const response = await fetch(url, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                contents: [{ parts: [{ text: userPrompt }] }],
+                                systemInstruction: { parts: [{ text: systemPrompt }] }
+                            })
+                        });
+
+                        const result = await response.json();
+                        const candidateText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                        if (candidateText) {
+                            setOracleResponse(candidateText);
+                            break;
+                        } else {
+                            throw new Error("Invalid response structure");
+                        }
+                    } catch (err) {
+                        if (attempt === 4) {
+                            setOracleResponse("「法不孤起，仗境方生。」禪院目前與法界連線受阻，請定心凝神，稍後再重新請益。");
+                        } else {
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                            delay *= 2;
+                        }
+                    }
+                }
+                setIsOracleLoading(false);
+            };
+
+            const palaceHexagramsList = useMemo(() => {
+                const list = [];
+                for (let id = 1; id <= 64; id++) {
+                    const h = ALL_HEXAGRAMS.find(x => x.id === id);
+                    if (h) {
+                        const key = h.binary.join("");
+                        const palaceInfo = PALACE_MAP[key];
+                        if (palaceInfo && palaceInfo.palace === activePalace) {
+                            list.push({
+                                ...h,
+                                ...palaceInfo
+                            });
+                        }
+                    }
+                }
+                list.sort((a, b) => a.genIndex - b.genIndex);
+                return list;
+            }, [activePalace]);
+
+            return (
+                <div className="flex-grow flex flex-col h-full bg-[#f4f0ea] relative overflow-hidden select-none">
+                    
+                    {/* Cinnabar Red Floating Notification Toast */}
+                    {toast && (
+                        <div className="fixed top-6 left-1/2 -translate-x-1/2 bg-[#a61b29] text-white px-5 py-3 rounded-lg shadow-xl z-50 text-xs tracking-wider flex items-center gap-3 animate-draw border border-[#85121c]">
+                            <i className="fa-solid fa-bell-ring animate-bounce"></i>
+                            <span>{toast}</span>
+                        </div>
+                    )}
+
+                    {/* Unified Monastery Header */}
+                    <div className="p-4 border-b border-[#d4c9b5] bg-[#e5ddd0]/90 backdrop-blur-md flex items-center justify-between shadow-sm z-30 shrink-0">
+                        <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-full bg-seal-red text-white flex items-center justify-center font-black text-sm shadow-md border border-[#85121c]/20">
+                                院
+                            </div>
+                            <div>
+                                <h1 className="font-extrabold text-neutral-800 tracking-wider text-sm md:text-base">禪宗密宗修道院</h1>
+                                <p className="text-[10px] text-neutral-500 tracking-wider font-semibold">六十四卦水墨禪修 ‧ 八宮搖卦占卜系統</p>
+                            </div>
+                        </div>
+                        <button 
+                            onClick={playZenChime}
+                            className="w-8 h-8 rounded-full bg-[#ede7dc] hover:bg-[#dfd7c8] transition-colors flex items-center justify-center text-neutral-600 hover:text-[#a61b29]"
+                            title="敲擊法磬"
+                        >
+                            <i className="fa-solid fa-bell text-sm"></i>
+                        </button>
+                    </div>
+
+                    {/* Responsive Double-Column / App Viewport */}
+                    <div className="flex-grow flex flex-col md:flex-row overflow-hidden relative z-10 pb-16 md:pb-0">
+                        
+                        {/* LEFT COLUMN: Sidebar (Desktop only) */}
+                        <div className="hidden md:flex w-80 bg-[#ede7dc] border-r border-[#d4c9b5] flex-col h-full">
+                            <div className="p-3">
+                                <div className="relative">
+                                    <input 
+                                        type="text"
+                                        placeholder="搜尋卦名、自然現象 (如: 水雷)..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="w-full pl-9 pr-4 py-2 bg-[#fcfaf7] border border-[#d4c9b5] rounded-lg focus:outline-none focus:border-[#a61b29] transition-all text-sm scroll-container placeholder-neutral-400"
+                                    />
+                                    <i className="fa-solid fa-feather-pointed absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 text-xs"></i>
+                                    {searchTerm && (
+                                        <button 
+                                            onClick={() => setSearchTerm("")}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                                        >
+                                            <i className="fa-solid fa-xmark"></i>
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="flex-grow overflow-y-auto px-2 pb-4 scroll-container">
+                                <div className="space-y-1">
+                                    {filteredHexagrams.map((spec) => {
+                                        const isSelected = spec.id === selectedId;
+                                        return (
+                                            <button
+                                                key={spec.id}
+                                                onClick={() => selectHexagram(spec.id, "details")}
+                                                className={`w-full text-left p-2.5 rounded-lg transition-all flex items-center justify-between group ${
+                                                    isSelected 
+                                                    ? "bg-[#dfd7c8] border-l-4 border-l-[#a61b29] shadow-sm text-neutral-900" 
+                                                    : "hover:bg-[#e8e0d1] text-neutral-700 hover:text-neutral-900"
+                                                }`}
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <span className={`text-[11px] font-mono w-5 text-right ${isSelected ? "text-[#a61b29] font-bold" : "text-neutral-400"}`}>
+                                                        {spec.id}
+                                                    </span>
+                                                    <span className="text-xl font-medium select-none text-neutral-800">
+                                                        {spec.unicode}
+                                                    </span>
+                                                    <div>
+                                                        <span className={`font-bold tracking-wide text-xs ${isSelected ? "text-[#a61b29]" : "text-neutral-800"}`}>
+                                                            {spec.naturalName}卦
+                                                        </span>
+                                                        <span className="block text-[9px] text-neutral-500 font-serif leading-none mt-0.5">
+                                                            {spec.upper}上{spec.lower}下
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <i className={`fa-solid fa-circle-chevron-right text-xs transition-transform duration-300 ${
+                                                    isSelected ? "text-[#a61b29] translate-x-0" : "text-neutral-300 group-hover:translate-x-1"
+                                                }`}></i>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* MOBILE TAB DISPLAY & CENTRAL SCREEN CONTROLLER */}
+                        <div className="flex-grow flex flex-col md:flex-row h-full overflow-hidden">
+                            
+                            {/* Mobile View tab: Search */}
+                            {activeTab === "search" && (
+                                <div className="flex-grow flex flex-col h-full bg-[#fcfaf7] md:hidden">
+                                    <div className="p-4 border-b border-[#ede7dc]">
+                                        <div className="relative">
+                                            <input 
+                                                type="text"
+                                                placeholder="搜尋卦名、自然 (如: 山水)..."
+                                                value={searchTerm}
+                                                onChange={(e) => setSearchTerm(e.target.value)}
+                                                className="w-full pl-9 pr-4 py-2.5 bg-[#f4f0ea] border border-[#d4c9b5] rounded-xl focus:outline-none focus:border-[#a61b29] text-sm"
+                                            />
+                                            <i className="fa-solid fa-feather-pointed absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"></i>
+                                        </div>
+                                    </div>
+                                    <div className="flex-grow overflow-y-auto p-2">
+                                        <div className="space-y-1">
+                                            {filteredHexagrams.map((spec) => (
+                                                <button
+                                                    key={spec.id}
+                                                    onClick={() => selectHexagram(spec.id, "details")}
+                                                    className={`w-full text-left p-3 rounded-xl flex items-center justify-between ${
+                                                        spec.id === selectedId ? "bg-[#ede7dc] text-neutral-900 font-bold" : "bg-white border border-neutral-100"
+                                                    }`}
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <span className="text-2xl">{spec.unicode}</span>
+                                                        <div>
+                                                            <div className="text-sm text-neutral-800">{spec.naturalName}卦</div>
+                                                            <div className="text-[10px] text-neutral-400 font-serif">{spec.upper}上{spec.lower}下 (第{spec.id}卦)</div>
+                                                        </div>
+                                                    </div>
+                                                    <i className="fa-solid fa-chevron-right text-xs text-neutral-300"></i>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Mobile / Tablet / Desktop View: 八宮卦分宮查詢 */}
+                            {((activeTab === "palaces") || true) && (
+                                <div className={`flex-grow h-full bg-[#fbf9f4] overflow-y-auto p-4 md:p-6 border-r border-[#ede7dc] ${activeTab === "palaces" ? "flex flex-col" : "hidden md:flex md:w-[360px] md:shrink-0 flex-col"}`}>
+                                    <h3 className="font-bold text-neutral-800 text-sm tracking-widest border-b border-[#ede7dc] pb-2 mb-4 flex items-center justify-between shrink-0">
+                                        <span>【 京氏易 ‧ 八宮卦分宮 】</span>
+                                        <span className="text-[10px] text-neutral-400 font-serif">歸魂遊魂 ‧ 乾坤大系</span>
+                                    </h3>
+
+                                    {/* Palace Select Tabs */}
+                                    <div className="grid grid-cols-4 gap-1.5 mb-4 shrink-0">
+                                        {PURE_TRIGRAMS.map(p => (
+                                            <button
+                                                key={p}
+                                                onClick={() => { setActivePalace(p); playZenChime(); }}
+                                                className={`py-1.5 rounded-lg font-bold text-xs transition-all ${
+                                                    activePalace === p 
+                                                    ? "bg-[#a61b29] text-white shadow-sm" 
+                                                    : "bg-[#ede7dc] hover:bg-[#dfd7c8] text-neutral-700"
+                                                }`}
+                                            >
+                                                {p}宮
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    {/* Palace Hexagram List */}
+                                    <div className="flex-grow overflow-y-auto space-y-2 pr-1 scroll-container">
+                                        {palaceHexagramsList.map((ph, idx) => (
+                                            <div 
+                                                key={ph.id}
+                                                onClick={() => selectHexagram(ph.id, "details")}
+                                                className={`p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between hover:border-[#a61b29]/40 ${
+                                                    ph.id === selectedId 
+                                                    ? "bg-[#ede7dc]/40 border-[#a61b29]" 
+                                                    : "bg-white border-neutral-200"
+                                                }`}
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-2xl text-neutral-800">{ph.unicode}</span>
+                                                    <div>
+                                                        <h4 className="font-bold text-xs text-neutral-800">{ph.naturalName}卦</h4>
+                                                        <p className="text-[10px] text-neutral-500 font-serif leading-none mt-1">
+                                                            宮屬：{ph.palace}宮 ‧ {ph.genName}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <i className="fa-solid fa-leaf text-xs text-neutral-300"></i>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Mobile / Desktop View: 靈錢起卦占卜 */}
+                            {((activeTab === "divine") || true) && (
+                                <div className={`flex-grow h-full bg-[#fbf9f4] overflow-y-auto p-4 md:p-6 border-r border-[#ede7dc] ${activeTab === "divine" ? "flex flex-col" : "hidden md:flex md:w-[360px] md:shrink-0 flex-col"}`}>
+                                    <h3 className="font-bold text-neutral-800 text-sm tracking-widest border-b border-[#ede7dc] pb-2 mb-4 flex items-center justify-between shrink-0">
+                                        <span>【 靈錢三錢占卜 / 起卦 】</span>
+                                        <span className="text-[10px] text-[#bfa15f] font-serif">手握靈錢 ‧ 叩首搖卦</span>
+                                    </h3>
+
+                                    {/* Quick action buttons */}
+                                    <div className="grid grid-cols-2 gap-2 mb-4 shrink-0">
+                                        <button 
+                                            onClick={quickDivine}
+                                            className="py-2 px-3 rounded-xl bg-[#ede7dc] hover:bg-[#dfd7c8] text-neutral-700 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                                        >
+                                            <i className="fa-solid fa-bolt-lightning text-[#bfa15f]"></i>
+                                            <span>快速一鍵起卦</span>
+                                        </button>
+                                        <button 
+                                            onClick={resetDivination}
+                                            className="py-2 px-3 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-600 text-xs flex items-center justify-center gap-1.5 transition-colors"
+                                        >
+                                            <i className="fa-solid fa-rotate-right"></i>
+                                            <span>清除起卦歷史</span>
+                                        </button>
+                                    </div>
+
+                                    {/* Main Coin Rolling Sandbox with refined visual details */}
+                                    {shakeStep < 6 ? (
+                                        <div className="bg-white p-5 rounded-2xl border border-neutral-200 text-center mb-4 shadow-sm shrink-0">
+                                            <p className="text-xs text-neutral-500 font-serif leading-relaxed mb-4">
+                                                手握三枚靈錢，凝神靜心。點擊下方按鈕起卦。<br/>
+                                                共需搖卦六次（自下而上：初爻至上爻）。
+                                            </p>
+
+                                            {/* Three Beautiful Custom Ancient Chinese Coins */}
+                                            <div className="flex justify-center gap-6 my-6">
+                                                {coins.map((side, index) => (
+                                                    <div 
+                                                        key={index}
+                                                        className={`w-14 h-14 rounded-full bg-gradient-to-br from-amber-600 via-yellow-700 to-amber-900 border-2 border-yellow-600 flex items-center justify-center shadow-md relative transition-transform ${
+                                                            isShaking ? "coin-spin" : "hover:scale-105"
+                                                        }`}
+                                                    >
+                                                        {/* Square Inner Hole */}
+                                                        <div className="w-5 h-5 bg-[#f4f0ea] border border-amber-800 flex items-center justify-center text-[9px] font-bold text-amber-900 font-serif shadow-inner">
+                                                            {side === 1 ? "陽" : "陰"}
+                                                        </div>
+                                                        {/* Ancient-style Calligraphy Characters */}
+                                                        <div className="absolute top-1 text-[7px] text-yellow-100 font-serif leading-none scale-90 select-none">乾</div>
+                                                        <div className="absolute bottom-1 text-[7px] text-yellow-100 font-serif leading-none scale-90 select-none">坤</div>
+                                                        <div className="absolute left-1 text-[7px] text-yellow-100 font-serif leading-none scale-90 select-none">通</div>
+                                                        <div className="absolute right-1 text-[7px] text-yellow-100 font-serif leading-none scale-90 select-none">寶</div>
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            <button
+                                                onClick={shakeCoins}
+                                                disabled={isShaking}
+                                                className="w-full py-3 bg-[#a61b29] hover:bg-[#a61b29]/90 text-white rounded-xl text-xs font-bold tracking-widest transition-all shadow-md flex items-center justify-center gap-2"
+                                            >
+                                                <i className="fa-solid fa-hand-holding-dollar"></i>
+                                                <span>搖動靈錢起卦 (第 {shakeStep + 1} 次)</span>
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="bg-[#fcfaf7] p-4 rounded-2xl border border-[#d9c093] mb-4 text-center shadow-sm shrink-0">
+                                            <span className="text-[10px] font-bold bg-[#a61b29] text-white px-2 py-0.5 rounded-full inline-block mb-2">起卦圓滿</span>
+                                            
+                                            <div className="grid grid-cols-2 gap-4 my-3">
+                                                <div className="bg-white p-3 rounded-xl border border-neutral-100">
+                                                    <span className="text-xs font-serif text-neutral-400 block font-bold scale-90">【本卦】當下狀態</span>
+                                                    <span className="text-sm font-bold text-[#a61b29] block my-1">
+                                                        {ALL_HEXAGRAMS.find(h => h.id === divinedHexId)?.naturalName || "未知"}
+                                                    </span>
+                                                    {divinedHexId && (
+                                                        <button 
+                                                            onClick={() => selectHexagram(divinedHexId, "details")}
+                                                            className="text-[10px] text-neutral-500 hover:text-[#a61b29] underline"
+                                                        >
+                                                            載入卦象
+                                                        </button>
+                                                    )}
+                                                </div>
+
+                                                <div className="bg-white p-3 rounded-xl border border-neutral-100">
+                                                    <span className="text-xs font-serif text-neutral-400 block font-bold scale-90">【之卦】演變方向</span>
+                                                    <span className="text-sm font-bold text-neutral-700 block my-1">
+                                                        {ALL_HEXAGRAMS.find(h => h.id === divinedChangeHexId)?.naturalName || "未知"}
+                                                    </span>
+                                                    {divinedChangeHexId && (
+                                                        <button 
+                                                            onClick={() => selectHexagram(divinedChangeHexId, "details")}
+                                                            className="text-[10px] text-neutral-500 hover:text-neutral-800 underline"
+                                                        >
+                                                            載入卦象
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            <button
+                                                onClick={() => {
+                                                    const name = ALL_HEXAGRAMS.find(h => h.id === divinedHexId)?.naturalName || "本卦";
+                                                    const changeName = ALL_HEXAGRAMS.find(h => h.id === divinedChangeHexId)?.naturalName || "之卦";
+                                                    setUserQuestion(`弟子求得占卜卦象，本卦為【${name}】、之卦為【${changeName}】，請禪師慈悲為弟子印心解讀！`);
+                                                    setActiveTab("details");
+                                                    playZenChime();
+                                                }}
+                                                className="w-full py-2.5 bg-[#a61b29] text-white rounded-xl text-xs font-bold transition-all shadow-md hover:bg-[#a61b29]/95"
+                                            >
+                                                請禪師印心解析此占卜
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {/* Shaked History Trace */}
+                                    <div className="flex-grow overflow-y-auto space-y-2 pr-1 scroll-container">
+                                        <h4 className="text-[11px] font-bold text-neutral-400 tracking-wider font-serif">爻線自下而上追蹤：</h4>
+                                        <div className="space-y-1">
+                                            {[...shakedLines].reverse().map((line, idx) => {
+                                                const trueIdx = 5 - idx;
+                                                return (
+                                                    <div key={trueIdx} className="bg-white p-2.5 rounded-xl border border-neutral-100 flex items-center justify-between text-xs animate-draw">
+                                                        <span className="font-mono text-neutral-400 font-bold">第 {trueIdx + 1} 爻</span>
+                                                        <div className="w-24 h-3 flex items-center">
+                                                            {line.isYang ? (
+                                                                <div className="h-2 w-full bg-neutral-800 rounded"></div>
+                                                            ) : (
+                                                                <div className="h-2 w-full flex justify-between gap-2">
+                                                                    <div className="h-full w-[45%] bg-neutral-800 rounded"></div>
+                                                                    <div className="h-full w-[45%] bg-neutral-800 rounded"></div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <span className="font-bold text-neutral-700">
+                                                            {line.sum}點 ({line.isChange ? "動爻" : "靜"})
+                                                        </span>
+                                                    </div>
+                                                );
+                                            })}
+                                            {shakedLines.length === 0 && (
+                                                <div className="p-8 text-center text-neutral-400 font-serif italic text-xs">
+                                                    「空寂法界，靜觀萬緣。」<br/>起卦後此處將自動繪製並追蹤爻線。
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Mobile / Tablet / Desktop View: 卦象妙諦 (Main Hexagram Details) */}
+                            {((activeTab === "details") || true) && (
+                                <div className={`flex-grow h-full overflow-y-auto p-4 md:p-8 flex flex-col bg-[#fcfaf7] ${activeTab === "details" ? "flex" : "hidden md:flex"}`}>
+                                    
+                                    {/* Visual Trigram Core Canvas Panel */}
+                                    <div className="ink-splash p-6 rounded-2xl text-center relative mb-6 border border-neutral-100 flex flex-col items-center justify-center min-h-[200px] shrink-0">
+                                        <div className="absolute text-9xl text-neutral-900/[0.04] select-none font-black italic">
+                                            {currentHex.unicode}
+                                        </div>
+
+                                        <div className="relative z-10">
+                                            <div className="text-seal-red font-semibold text-[10px] tracking-widest uppercase mb-1">
+                                                「 萬物資始 ‧ 乾坤定法 」
+                                            </div>
+                                            <h1 className="text-2xl md:text-3xl font-extrabold tracking-widest text-neutral-800 mb-1">
+                                                {currentHex.naturalName}卦
+                                            </h1>
+                                            <p className="text-[10px] text-neutral-500 font-serif italic tracking-wider">
+                                                第 {currentHex.id} 卦 ‧ {currentHex.upper}上{currentHex.lower}下 ({TRIGRAMS[currentHex.upper].nature}上{TRIGRAMS[currentHex.lower].nature}下)
+                                            </p>
+                                        </div>
+
+                                        {/* Classic Lines Display Stack */}
+                                        <div className="w-48 my-4 space-y-2.5 flex flex-col justify-center">
+                                            {[...currentHex.binary].reverse().map((lineState, idx) => {
+                                                const linePosIndex = 5 - idx; 
+                                                const isActive = activeLine === linePosIndex;
+                                                const labelText = lineState === 1 ? `九${getLinePositionText(linePosIndex)}` : `六${getLinePositionText(linePosIndex)}`;
+                                                
+                                                return (
+                                                    <button 
+                                                        key={linePosIndex}
+                                                        onClick={() => {
+                                                            setActiveLine(isActive ? null : linePosIndex);
+                                                            playZenChime();
+                                                        }}
+                                                        className={`w-full group focus:outline-none transition-all flex items-center gap-3 py-1 px-2 rounded-lg hover:bg-neutral-900/[0.03] ${
+                                                            isActive ? "bg-neutral-900/5 ring-1 ring-[#a61b29]/20" : ""
+                                                        }`}
+                                                    >
+                                                        <span className={`text-[10px] font-mono font-bold w-10 text-left transition-colors ${
+                                                            isActive ? "text-[#a61b29]" : "text-neutral-400 group-hover:text-[#a61b29]"
+                                                        }`}>
+                                                            {labelText}
+                                                        </span>
+                                                        <div className="flex-grow">
+                                                            {renderLineGlyph(lineState === 1, isActive, linePosIndex)}
+                                                        </div>
+                                                    </button>
+                                                );
+                                            })}
+                                            <div className="flex justify-between text-[9px] text-neutral-400 px-1 pt-1 font-serif select-none">
+                                                <span>【 初爻 ‧ 地 】</span>
+                                                <span>【 上爻 ‧ 天 】</span>
+                                            </div>
+                                        </div>
+
+                                        <p className="text-[9px] text-neutral-400 font-serif italic select-none">
+                                            ( 點選任何爻線，可開示對應的爻辭及印心禪解 )
+                                        </p>
+                                    </div>
+
+                                    {/* Core Scriptures & Scripture Tabs */}
+                                    <div className="space-y-4 flex-grow scroll-container">
+                                        
+                                        {/* 卦辭 */}
+                                        <div className="bg-[#fcfbf9] border-l-4 border-[#a61b29] p-4 rounded-r-xl shadow-sm">
+                                            <span className="text-[10px] font-bold text-[#a61b29] tracking-wider block mb-1">【 卦辭 ‧ 乾坤大旨 】</span>
+                                            <p className="text-base text-neutral-800 font-medium tracking-wide leading-relaxed font-serif">
+                                                {currentHex.guaci}
+                                            </p>
+                                        </div>
+
+                                        {/* 大象辭 */}
+                                        <div className="bg-[#fcfbf9] border-l-4 border-[#bfa15f] p-4 rounded-r-xl shadow-sm">
+                                            <span className="text-[10px] font-bold text-[#bfa15f] tracking-wider block mb-1">【 大象辭 ‧ 天人照應 】</span>
+                                            <p className="text-sm text-neutral-700 tracking-wide leading-relaxed font-serif">
+                                                {currentHex.xiangci}
+                                            </p>
+                                        </div>
+
+                                        {/* Dynamic Selected Line Statement Callout */}
+                                        {activeLine !== null ? (
+                                            <div className="bg-[#f5ebd7] border border-[#d9c093] p-4 rounded-2xl shadow-sm animate-draw">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <span className="text-xs font-bold text-[#a61b29] tracking-widest">
+                                                        【 {activeLine === 0 ? "初爻" : activeLine === 5 ? "上爻" : `第 ${activeLine + 1} 爻`} ‧ {currentHex.binary[activeLine] === 1 ? "九" : "六"}爻爻辭 】
+                                                    </span>
+                                                    <button 
+                                                        onClick={() => setActiveLine(null)}
+                                                        className="text-neutral-400 hover:text-neutral-700"
+                                                    >
+                                                        <i className="fa-solid fa-circle-xmark"></i>
+                                                    </button>
+                                                </div>
+                                                <p className="text-base font-bold text-neutral-800 mb-2 font-serif">
+                                                    {currentHex.lines_ci[activeLine]}
+                                                </p>
+                                                <div className="border-t border-[#d9c093]/30 pt-2">
+                                                    <span className="text-[9px] font-bold text-neutral-500 block mb-0.5">【 禪密印心啟示 】</span>
+                                                    <p className="text-xs text-neutral-600 leading-relaxed font-serif">
+                                                        {getLineSpiritualInterpretation(currentHex.id, activeLine, currentHex.binary[activeLine] === 1)}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="bg-[#fcfbf9] border border-neutral-200/60 p-4 rounded-2xl text-center text-neutral-500 font-serif text-xs py-6 shadow-sm">
+                                                <i className="fa-solid fa-circle-info text-[#bfa15f] text-sm mb-1.5 block"></i>
+                                                <p>點選卦象的具體爻位，即可在此查閱爻辭與修道院印心法要。</p>
+                                            </div>
+                                        )}
+
+                                        {/* Meditation Zen Tips */}
+                                        <div className="bg-neutral-50 border border-neutral-200/60 p-4 rounded-2xl shadow-sm">
+                                            <span className="text-[10px] font-bold text-neutral-500 tracking-wider block mb-1">【 修道院長老印心禪解 】</span>
+                                            <p className="text-xs text-neutral-600 leading-relaxed font-serif">
+                                                {currentHex.zen_tips}
+                                            </p>
+                                        </div>
+
+                                        {/* Transformation Grid (Cuo/Zong/Fu/Za) */}
+                                        <div className="bg-[#f7f4ed] p-4 rounded-2xl border border-neutral-200/60 shadow-sm">
+                                            <h4 className="text-xs font-bold tracking-widest text-neutral-800 border-b border-neutral-200/60 pb-1.5 mb-3">
+                                                【 錯綜複雜 ‧ 萬法演化 】
+                                            </h4>
+                                            <div className="grid grid-cols-2 gap-2 text-xs">
+                                                <div className="bg-white p-2.5 rounded-xl border border-neutral-100 flex justify-between items-center hover:border-neutral-300">
+                                                    <div>
+                                                        <span className="text-[10px] text-neutral-400 font-serif block">錯卦 (對立)</span>
+                                                        <span className="font-bold text-neutral-800">{cuoHex?.naturalName || "無"}</span>
+                                                    </div>
+                                                    {cuoHex && (
+                                                        <button 
+                                                            onClick={() => selectHexagram(cuoHex.id, "details")}
+                                                            className="text-[10px] text-[#a61b29] font-bold"
+                                                        >
+                                                            載入
+                                                        </button>
+                                                    )}
+                                                </div>
+                                                <div className="bg-white p-2.5 rounded-xl border border-neutral-100 flex justify-between items-center hover:border-neutral-300">
+                                                    <div>
+                                                        <span className="text-[10px] text-neutral-400 font-serif block">綜卦 (換位)</span>
+                                                        <span className="font-bold text-neutral-800">{zongHex?.naturalName || "無"}</span>
+                                                    </div>
+                                                    {zongHex && (
+                                                        <button 
+                                                            onClick={() => selectHexagram(zongHex.id, "details")}
+                                                            className="text-[10px] text-[#a61b29] font-bold"
+                                                        >
+                                                            載入
+                                                        </button>
+                                                    )}
+                                                </div>
+                                                <div className="bg-white p-2.5 rounded-xl border border-neutral-100 flex justify-between items-center hover:border-neutral-300">
+                                                    <div>
+                                                        <span className="text-[10px] text-neutral-400 font-serif block">復卦 (循環)</span>
+                                                        <span className="font-bold text-neutral-800">{fuHex?.naturalName || "無"}</span>
+                                                    </div>
+                                                    {fuHex && (
+                                                        <button 
+                                                            onClick={() => selectHexagram(fuHex.id, "details")}
+                                                            className="text-[10px] text-[#a61b29] font-bold"
+                                                        >
+                                                            載入
+                                                        </button>
+                                                    )}
+                                                </div>
+                                                <div className="bg-white p-2.5 rounded-xl border border-neutral-100 flex justify-between items-center hover:border-neutral-300">
+                                                    <div>
+                                                        <span className="text-[10px] text-neutral-400 font-serif block">雜卦 (交互)</span>
+                                                        <span className="font-bold text-neutral-800">{zaHex?.naturalName || "無"}</span>
+                                                    </div>
+                                                    {zaHex && (
+                                                        <button 
+                                                            onClick={() => selectHexagram(zaHex.id, "details")}
+                                                            className="text-[10px] text-[#a61b29] font-bold"
+                                                        >
+                                                            載入
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Three Polar Stages */}
+                                        <div className="bg-[#f7f4ed] p-4 rounded-2xl border border-neutral-200/60 space-y-3 shadow-sm">
+                                            <h4 className="text-xs font-bold tracking-widest text-neutral-800 border-b border-neutral-200/60 pb-1.5 mb-1">
+                                                【 六爻三極 ‧ 天地演進 】
+                                            </h4>
+                                            
+                                            <div className="bg-white p-3 rounded-xl border border-neutral-100 flex justify-between items-center text-xs hover:border-neutral-300">
+                                                <div>
+                                                    <span className="text-[10px] text-neutral-400 font-serif block">第一極 (初23爻 + 234爻)</span>
+                                                    <span className="font-bold text-neutral-800">
+                                                        {polarOne ? `起創 ‧ ${polarOne.naturalName}` : "無"}
+                                                    </span>
+                                                </div>
+                                                {polarOne && (
+                                                    <button 
+                                                        onClick={() => selectHexagram(polarOne.id, "details")}
+                                                        className="text-[10px] text-[#a61b29] font-bold"
+                                                    >
+                                                        載入
+                                                    </button>
+                                                )}
+                                            </div>
+
+                                            <div className="bg-white p-3 rounded-xl border border-neutral-100 flex justify-between items-center text-xs hover:border-neutral-300">
+                                                <div>
+                                                    <span className="text-[10px] text-neutral-400 font-serif block">第二極 (234爻 + 345爻)</span>
+                                                    <span className="font-bold text-neutral-800">
+                                                        {polarTwo ? `運行 ‧ ${polarTwo.naturalName}` : "無"}
+                                                    </span>
+                                                </div>
+                                                {polarTwo && (
+                                                    <button 
+                                                        onClick={() => selectHexagram(polarTwo.id, "details")}
+                                                        className="text-[10px] text-[#a61b29] font-bold"
+                                                    >
+                                                        載入
+                                                    </button>
+                                                )}
+                                            </div>
+
+                                            <div className="bg-white p-3 rounded-xl border border-neutral-100 flex justify-between items-center text-xs hover:border-neutral-300">
+                                                <div>
+                                                    <span className="text-[10px] text-neutral-400 font-serif block">第三極 (345爻 + 456爻)</span>
+                                                    <span className="font-bold text-neutral-800">
+                                                        {polarThree ? `歸宿 ‧ ${polarThree.naturalName}` : "無"}
+                                                    </span>
+                                                </div>
+                                                {polarThree && (
+                                                    <button 
+                                                        onClick={() => selectHexagram(polarThree.id, "details")}
+                                                        className="text-[10px] text-[#a61b29] font-bold"
+                                                    >
+                                                        載入
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* AI Oracle Sandbox */}
+                                        <div className="border border-neutral-200 rounded-2xl p-4 bg-[#faf6ed] shadow-sm relative overflow-hidden">
+                                            <div className="absolute right-4 top-4 opacity-[0.05] select-none text-6xl text-seal-red">
+                                                <i className="fa-solid fa-dharmachakra animate-spin-slow"></i>
+                                            </div>
+
+                                            <h3 className="font-bold text-neutral-800 text-xs tracking-widest mb-2 flex items-center gap-2">
+                                                <span className="w-2 h-2 rounded-full bg-seal-red animate-ping"></span>
+                                                <span>修道院長老法界印心開示</span>
+                                            </h3>
+
+                                            <textarea 
+                                                rows="3"
+                                                placeholder="在此輸入您此時此刻正遭遇的困境、修道疑惑或世間煩惱..."
+                                                value={userQuestion}
+                                                onChange={(e) => setUserQuestion(e.target.value)}
+                                                className="w-full p-3 text-xs bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#a61b29] resize-none scroll-container"
+                                            ></textarea>
+
+                                            <button
+                                                onClick={() => askAbbotOracle()}
+                                                disabled={isOracleLoading || !userQuestion.trim()}
+                                                className={`w-full mt-2 py-2.5 rounded-xl font-bold text-xs tracking-wider transition-all shadow-md flex items-center justify-center gap-2 ${
+                                                    isOracleLoading || !userQuestion.trim()
+                                                    ? "bg-neutral-300 text-neutral-500 cursor-not-allowed shadow-none"
+                                                    : "bg-seal-red text-white hover:bg-seal-red/90"
+                                                }`}
+                                            >
+                                                {isOracleLoading ? (
+                                                    <>
+                                                        <i className="fa-solid fa-spinner animate-spin"></i>
+                                                        <span>長老參禪觀照法界中...</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <i className="fa-solid fa-seedling"></i>
+                                                        <span>請禪師開示當前局勢</span>
+                                                    </>
+                                                )}
+                                            </button>
+
+                                            {oracleResponse && (
+                                                <div className="mt-4 bg-white border border-[#ede7dc] rounded-xl p-4 max-h-[300px] overflow-y-auto scroll-container animate-draw">
+                                                    <div className="text-xs text-neutral-700 leading-relaxed font-serif whitespace-pre-line prose max-w-none">
+                                                        {oracleResponse}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                    </div>
+                                </div>
+                            )}
+
+                        </div>
+
+                    </div>
+
+                    {/* MOBILE TAB BAR BOTTOM NAVIGATION */}
+                    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#ede7dc]/95 backdrop-blur-md border-t border-[#d4c9b5] flex justify-around py-2.5 z-40 shadow-lg">
+                        <button 
+                            onClick={() => { setActiveTab("search"); playZenChime(); }}
+                            className={`flex flex-col items-center gap-1 text-[10px] font-bold ${activeTab === "search" ? "text-[#a61b29]" : "text-neutral-500"}`}
+                        >
+                            <i className="fa-solid fa-scroll text-base"></i>
+                            <span>檢索目錄</span>
+                        </button>
+                        <button 
+                            onClick={() => { setActiveTab("palaces"); playZenChime(); }}
+                            className={`flex flex-col items-center gap-1 text-[10px] font-bold ${activeTab === "palaces" ? "text-[#a61b29]" : "text-neutral-500"}`}
+                        >
+                            <i className="fa-solid fa-circle-nodes text-base"></i>
+                            <span>八宮大系</span>
+                        </button>
+                        <button 
+                            onClick={() => { setActiveTab("divine"); playZenChime(); }}
+                            className={`flex flex-col items-center gap-1 text-[10px] font-bold ${activeTab === "divine" ? "text-[#a61b29]" : "text-neutral-500"}`}
+                        >
+                            <i className="fa-solid fa-coins text-base"></i>
+                            <span>起卦占卜</span>
+                        </button>
+                        <button 
+                            onClick={() => { setActiveTab("details"); playZenChime(); }}
+                            className={`flex flex-col items-center gap-1 text-[10px] font-bold ${activeTab === "details" ? "text-[#a61b29]" : "text-neutral-500"}`}
+                        >
+                            <i className="fa-solid fa-leaf text-base"></i>
+                            <span>卦象妙諦</span>
+                        </button>
+                    </div>
+
+                </div>
+            );
+        }
+
+        function getLinePositionText(pos) {
+            switch(pos) {
+                case 0: return "初";
+                case 1: return "二";
+                case 2: return "三";
+                case 3: return "四";
+                case 4: return "五";
+                case 5: return "上";
+                default: return "";
+            }
+        }
+
+        function getLineSpiritualInterpretation(hexId, linePos, isYang) {
+            const yinYangSpiritual = isYang ? "剛健之氣" : "柔順之德";
+            const positionLessons = [
+                "【萌芽與潛藏】：代表處於局勢之底，元氣未足。切忌鋒芒太露、急於求成。此時修行當以「靜虛觀照」為根本，積蓄實力，深挖定力。",
+                "【中正與平穩】：正值內卦之中位，陰陽調和。行止得宜，得大眾協助。代表此時最應守持「中道」，隨緣行善，身心常保平衡安適。",
+                "【危險與轉折】：處於內卦與外卦的交接過渡點。局勢變幻莫測，極易多疑多懼。切記「夕惕若厲」，在危險邊緣中時時提起覺照，便能轉危為安。",
+                "【試探與高企】：已踏入外卦高位，戰戰兢兢。代表即將迎來變局大展宏圖。修行者應退居幕後、守持無我謙恭，戒慎恐懼，切莫貪戀權位。",
+                "【尊榮與頂峰】：此乃大中至正、君臨天下之位。代表無漏無滯的完滿。當以廣大悲憫、大公無私、救度一切眾生之心相應，則福報無限，諸佛護祐。",
+                "【窮盡與消亡】：事物已發展到最終的極致，隨即面臨逆轉與反彈（物極必反）。防範盛極而衰。此時應「急流勇退」，放下所有執著，回歸清淨本源。"
+            ];
+
+            const specs = ALL_HEXAGRAMS.find(h => h.id === hexId);
+            const name = specs ? specs.naturalName : "卦";
+
+            return `弟子在《${name}卦》中觸及此爻。這代表著在此卦相所指引的局勢中，${positionLessons[linePos]}。利用其內含的【${yinYangSpiritual}】，您當能在塵俗考驗中圓通無礙、見性成佛。`;
+        }
+
+        const renderLineGlyph = (isYang, isHighlighted = false, index = 0) => {
+            const glowClass = isHighlighted ? "shadow-[0_0_15px_rgba(166,27,41,0.4)]" : "";
+            
+            if (isYang) {
+                return (
+                    <div className={`h-4 w-full bg-gradient-to-r from-neutral-800 via-neutral-900 to-neutral-800 rounded transition-all duration-300 ${glowClass}`}></div>
+                );
+            } else {
+                return (
+                    <div className="h-4 w-full flex justify-between gap-4 relative transition-all duration-300">
+                        <div className={`h-full w-[45%] bg-gradient-to-r from-neutral-800 via-neutral-900 to-neutral-800 rounded ${glowClass}`}></div>
+                        <div className="w-[10%] h-full flex items-center justify-center opacity-25">
+                            <span className="text-[6px] text-[#a61b29] font-bold">•</span>
+                        </div>
+                        <div className={`h-full w-[45%] bg-gradient-to-l from-neutral-800 via-neutral-900 to-neutral-800 rounded ${glowClass}`}></div>
+                    </div>
+                );
+            }
+        };
+
+        window.onload = function() {
+            const container = document.getElementById('root');
+            const root = ReactDOM.createRoot(container);
+            root.render(<App />);
+        }
+    </script>
+</body>
+</html>
