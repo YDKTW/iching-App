@@ -6,7 +6,7 @@
   const appEl       = document.getElementById("app");
   const headerMainEl = document.querySelector(".header-main-title");
   const headerSubEl  = document.querySelector(".header-sub-title");
-  const SUBTITLE     = "禪宗秘宗修道院製作";
+  const SUBTITLE     = "";
   function setHeader(main, sub) {
     if (headerMainEl) headerMainEl.textContent = main;
     if (headerSubEl)  headerSubEl.textContent  = sub || SUBTITLE;
@@ -170,10 +170,6 @@
     const bagongBadges = bg ? `
       <div class="bagong-badges">
         <span class="bb bb-gong">${bg.gong}宮</span>
-        <span class="bb bb-wx">${bg.wuxing}行</span>
-        <span class="bb bb-pos">${bg.pos}</span>
-        <span class="bb bb-shi">世：${YAO_POS[bg.shi]}爻</span>
-        <span class="bb bb-ying">應：${YAO_POS[bg.ying]}爻</span>
       </div>` : "";
 
     const headHtml = `
@@ -195,7 +191,7 @@
     if      (tab === "yao")     body = renderYaoTab(h, bg);
     else if (tab === "related") body = renderRelatedTab(h);
     else if (tab === "nuclear") body = renderNuclearTab(h);
-    else if (tab === "bagong")  body = renderBagongTab(h, bg);
+
 
     appEl.innerHTML = headHtml + body;
     bindDetailEvents();
