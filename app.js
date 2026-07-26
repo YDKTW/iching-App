@@ -4,7 +4,13 @@
 
   // ── DOM 參考 ────────────────────────────────────────
   const appEl       = document.getElementById("app");
-  const headerTitle = document.getElementById("headerTitle");
+  const headerMainEl = document.querySelector(".header-main-title");
+  const headerSubEl  = document.querySelector(".header-sub-title");
+  const SUBTITLE     = "禪宗秘宗修道院製作";
+  function setHeader(main, sub) {
+    if (headerMainEl) headerMainEl.textContent = main;
+    if (headerSubEl)  headerSubEl.textContent  = sub || SUBTITLE;
+  }
   const backBtn     = document.getElementById("backBtn");
   const bottomNav   = document.getElementById("bottomNav");
   const themeBtn    = document.getElementById("themeBtn");
@@ -106,7 +112,7 @@
 
   // ── 渲染：卦格列表 ──────────────────────────────────
   function renderGrid() {
-    headerTitle.textContent = "周易六十四卦";
+    setHeader("周易六十四卦");
     backBtn.hidden = true;
     bottomNav.hidden = true;
 
@@ -155,7 +161,7 @@
     const h  = byNum[selected];
     const bg = getBagong(h);
 
-    headerTitle.textContent = `${h.n}. ${h.name}`;
+    setHeader(`${h.n}. ${h.name}`, SUBTITLE);
     backBtn.hidden  = false;
     bottomNav.hidden = false;
     bottomNav.querySelectorAll(".nav-btn").forEach(btn =>
