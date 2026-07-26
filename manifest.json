@@ -1,0 +1,12 @@
+{
+  "name": "周易六十四卦查詢系統",
+  "short_name": "周易六十四卦",
+  "description": "互動式周易六十四卦查詢工具，含卦辭、爻辭、錯綜複雜卦與六爻三極卦",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fafaf7",
+  "theme_color": "#1a1a1a",
+  "lang": "zh-TW",
+  "icons": []
+}

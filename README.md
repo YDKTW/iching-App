@@ -1,9 +1,53 @@
-# iching-App
-六十四卦水墨禪修查詢系統
-運用周易六十四卦的基本定義的內容，搭配錯綜複雜及八宮變化，讓用戶可以即時查詢本卦的各種卦變情況。使得理解週易由各定義卦、卦序排列的綜向學習，轉而形成橫向的卦象變化鏈接，整體掌握一個卦象的系統網絡，可以更全面的理解四六十卦的核心含意。
+# 周易六十四卦查詢系統
 
-Grounded in the core definitions of the 64 hexagrams of the I Ching (Book of Changes), this project incorporates theories of opposite (錯), inverted (綜), nuclear (複/交互), and Eight Palaces (八宮) hexagram transformations to allow users to query real-time dynamic shifts for any primary hexagram.
-本計畫以《易經》六十四卦的核心定義為基礎，融合了對卦、逆卦、核卦和八宮卦的理論，使用戶能夠查詢任何主要卦象的即時動態變更。
+互動式周易（易經）六十四卦查詢工具的網頁應用原型（App Prototype）。純前端 HTML/CSS/JavaScript 實作，無需後端、無外部依賴，可直接在瀏覽器開啟或部署至 GitHub Pages。
 
-By leveraging this tool, learners can bridge the gap from traditional vertical learning—focused on isolated hexagram definitions and sequential order—to horizontal connections driven by dynamic hexagram interplay. This approach helps establish a comprehensive hexagram network, enabling a deeper, holistic understanding of the core essence behind the 64 hexagrams.
-透過利用這項工具，學習者可以彌合傳統縱向學習（側重於孤立的卦象定義和順序）與由動態卦象互動驅動的橫向連結之間的鴻溝。這種方法有助於建立一個全面的卦象網絡，從而更深入、更全面地理解六十四卦背後的核心本質。
+## 功能
+
+- **六十四卦總覽**：以卡片格線顯示全部六十四卦，可依卦名或卦序搜尋。
+- **卦辭與爻辭**：點選任一卦，顯示卦辭、大象辭，以及六爻完整爻辭。
+- **錯綜複雜卦**：
+  - 錯卦（陰陽互換）— 完整顯示六爻爻辭
+  - 綜卦（上下顛倒）— 顯示卦辭
+  - 複雜卦（錯綜合體）— 顯示卦辭
+  - 三者均可點擊直接跳轉
+- **六爻三極卦**：依爻位取三組互卦（初~四爻、二~五爻、三~六爻組合），各顯示對應卦象與卦辭。
+- 響應式設計，模擬手機 App 介面（底部分頁導覽、返回鍵），支援深色模式。
+
+## 專案結構
+
+```
+iching-app/
+├── index.html       # 入口頁面（App shell）
+├── style.css         # 樣式（含深色模式）
+├── hexagrams.js      # 六十四卦資料（卦辭、大象辭、爻辭）
+├── app.js            # 應用邏輯（路由、渲染、卦象關係運算）
+├── manifest.json     # PWA manifest（可加到主畫面）
+└── README.md
+```
+
+## 本機執行
+
+不需要建置工具，直接用任何靜態伺服器開啟即可，例如：
+
+```bash
+cd iching-app
+python3 -m http.server 8080
+# 開啟瀏覽器 http://localhost:8080
+```
+
+或直接用瀏覽器開啟 `index.html`（部分瀏覽器對 `file://` 開啟 JS 模組有限制，建議用本機伺服器）。
+
+## 卦象關係運算說明
+
+- **錯卦**：六爻陰陽全部互換（initial binary 逐位反轉）。
+- **綜卦**：卦象上下顛倒（六爻順序整體反轉）。
+- **複雜卦**：先綜後錯（或先錯後綜，結果相同）。
+- **六爻三極卦**：
+  - 初～四爻：取第1-2-3爻為下卦、第2-3-4爻為上卦
+  - 二～五爻：取第2-3-4爻為下卦、第3-4-5爻為上卦
+  - 三～六爻：取第3-4-5爻為下卦、第4-5-6爻為上卦
+
+## 部署到 GitHub Pages
+
+詳見下方「上傳 GitHub」說明。
